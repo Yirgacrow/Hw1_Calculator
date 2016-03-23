@@ -21,19 +21,44 @@ class ViewController: UIViewController {
         self.resetCore()
     }
     
+    var userIsEnteringNumbers = false
+    var userInsertedADot = false
+    
     @IBOutlet weak var displayLabel: DisplayLabel!
 
     @IBAction func numericButtonClicked(sender: UIButton) {
         if sender.tag >= 1000 && sender.tag < 1010 {
             self.displayLabel.append(sender.tag - 1000)
+            userIsEnteringNumbers = true
         } else if sender.tag == 1010 {
+            
+            if self.displayLabel.text?.containsString(".") == true{
+                userInsertedADot = true
+            }
+            
+            if !userInsertedADot && userIsEnteringNumbers {
+                displayLabel.text = displayLabel.text! + "."
+                userInsertedADot = true
+            }
+            if !userInsertedADot && !userIsEnteringNumbers {
+                displayLabel.text =  "0."
+                userInsertedADot = true
+                userIsEnteringNumbers = true
+            }
+        }
+        else if sender.tag == 1011 {
             self.displayLabel.append(0)
             self.displayLabel.append(0)
         }
+        print("operandStack = \(displayLabel)")
     }
 
     @IBAction func negativeButtonClicked(sender: UIButton) {
         self.displayLabel.changeSign()
+    }
+    
+    @IBAction func percentButtonClicked(sender: UIButton) {
+        self.displayLabel.percent()
     }
 
     @IBAction func operatorButtonClicked(sender: UIButton) {
@@ -44,11 +69,16 @@ class ViewController: UIViewController {
             try! self.core.addStep(+)
         case "-":
             try! self.core.addStep(-)
+        case "×":
+            try! self.core.addStep(*)
+        case "÷":
+            try! self.core.addStep(/)
         default:
             break
         }
-
         self.displayLabel.clear()
+        userIsEnteringNumbers = false
+        userInsertedADot = false
     }
 
     @IBAction func calculateButtonClicked(sender: UIButton) {
@@ -60,5 +90,7 @@ class ViewController: UIViewController {
     @IBAction func resetButtonClicked(sender: UIButton) {
         self.resetCore()
         self.displayLabel.clear()
+        userIsEnteringNumbers = false
+        userInsertedADot = false
     }
 }
